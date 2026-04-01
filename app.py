@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 
 from scripts.validations import run_all_checks
-from scripts.sql_checks import run_sql_checks
+#from scripts.sql_checks import run_sql_checks
 from scripts.report_generator import generate_summary
 
 st.set_page_config(page_title="Data Quality App", layout="wide")
