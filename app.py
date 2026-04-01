@@ -20,10 +20,10 @@ if file:
 
    # 🔥 Convert numeric columns safely
    for col in df.columns:
-    try:
-        df[col] = pd.to_numeric(df[col], errors="coerce")
-    except Exception:
-        pass
+        try:
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+        except Exception:
+            pass
 
     st.subheader("📄 Raw Data")
     st.dataframe(df)
