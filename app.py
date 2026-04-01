@@ -19,7 +19,10 @@ if file:
 
 
    # 🔥 Convert numeric columns safely
-   for col in df.columns:
+    if file is not None:
+    df = pd.read_csv(file)
+
+    for col in df.columns:
         try:
             df[col] = pd.to_numeric(df[col], errors="coerce")
         except Exception:
