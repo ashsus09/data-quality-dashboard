@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 
 from scripts.validations import run_all_checks
-# from scripts.sql_checks import run_sql_checks
+# from scripts.sql_checks import run_sql_checks   # enable if needed
 from scripts.report_generator import generate_summary
 
 st.set_page_config(page_title="Data Quality App", layout="wide")
@@ -17,12 +17,12 @@ if file:
     # 🔥 Clean dirty values
     df = df.replace(["None", "UNKNOWN", "ERROR", ""], pd.NA)
 
-    # 🔥 Convert numeric columns safely
-    for col in df.columns:
-        try:
+    # 🔥 Convert ONLY numeric columns (IMPORTANT FIX)
+    numeric_cols = ["Price Per Unit", "Quantity", "Total Spent"]
+
+    for col in numeric_cols:
+        if col in df.columns:
             df[col] = pd.to_numeric(df[col], errors="coerce")
-        except Exception:
-            pass
 
     st.subheader("📄 Raw Data")
     st.dataframe(df)
@@ -33,7 +33,7 @@ if file:
     # ✅ Summary
     summary = generate_summary(df, errors)
 
-    # 🎯 Score + Alert
+    # 🎯 Quality Score
     st.subheader("📊 Quality Score")
     st.metric("Score", f"{summary['quality_score']}%")
 
@@ -48,15 +48,17 @@ if file:
     st.subheader("📊 Data Profile")
     st.write(df.describe(include="all"))
 
-    # 🗄️ SQL checks (only if you re-enable import)
+    # 🗄️ SQL checks (optional)
     # sql_result = run_sql_checks(df)
     # st.subheader("🗄️ SQL Checks")
     # st.write(sql_result)
 
-    # 📊 Error Summary
+    # 📊 Error Summary Chart
     st.subheader("📊 Error Summary")
-    if not errors.empty:
+    if not errors.empty and "error" in errors.columns:
         st.bar_chart(errors["error"].value_counts())
+    else:
+        st.info("No error summary available")
 
     # ❌ Errors Table
     st.subheader("❌ Errors")
