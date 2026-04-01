@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 
 from scripts.validations import run_all_checks
-#from scripts.sql_checks import run_sql_checks
+# from scripts.sql_checks import run_sql_checks
 from scripts.report_generator import generate_summary
 
 st.set_page_config(page_title="Data Quality App", layout="wide")
@@ -17,11 +17,7 @@ if file:
     # 🔥 Clean dirty values
     df = df.replace(["None", "UNKNOWN", "ERROR", ""], pd.NA)
 
-
-   # 🔥 Convert numeric columns safely
-    if file is not None:
-    df = pd.read_csv(file)
-
+    # 🔥 Convert numeric columns safely
     for col in df.columns:
         try:
             df[col] = pd.to_numeric(df[col], errors="coerce")
@@ -52,11 +48,10 @@ if file:
     st.subheader("📊 Data Profile")
     st.write(df.describe(include="all"))
 
-    # 🗄️ SQL checks
-    sql_result = run_sql_checks(df)
-
-    st.subheader("🗄️ SQL Checks")
-    st.write(sql_result)
+    # 🗄️ SQL checks (only if you re-enable import)
+    # sql_result = run_sql_checks(df)
+    # st.subheader("🗄️ SQL Checks")
+    # st.write(sql_result)
 
     # 📊 Error Summary
     st.subheader("📊 Error Summary")
@@ -67,11 +62,12 @@ if file:
     st.subheader("❌ Errors")
 
     if not errors.empty:
-         errors_display = errors.reset_index(drop=True)
-         st.dataframe(errors_display)
-         st.write(f"Total Errors: {len(errors_display)}")
+        errors_display = errors.reset_index(drop=True)
+        st.dataframe(errors_display)
+        st.write(f"Total Errors: {len(errors_display)}")
     else:
-         st.success("No errors found")
+        st.success("No errors found")
+
     # 📥 Download Report
     if not errors.empty:
         csv = errors.to_csv(index=False).encode("utf-8")
